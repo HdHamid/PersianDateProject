@@ -68,5 +68,7 @@
     <Build Include="dbo\Stored Procedures\FillDimDate.sql" />
     <Build Include="dbo\Functions\PersianDateDiff.sql" />
     <Build Include="dbo\Functions\PersianDateAdd.sql" />
+    <Build Include="dbo\Tables\DimDateDiff.sql" />
+    <Build Include="dbo\Stored Procedures\FillDimDateDiff.sql" />
   </ItemGroup>
 </Project>

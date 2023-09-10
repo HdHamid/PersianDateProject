@@ -18,7 +18,7 @@ BEGIN
 
 	SELECT @YearTo = FrYear ,@MonthTo = FrMonth,@DayTo = FrDay , @SeqIdTo = SeqID FROM dbo.DimDate WHERE Frdt = @ToDate
 
-	DECLARE @DifYear INT , @DifMonth INT, @DifDay INT
+	DECLARE @DifYear INT =0, @DifMonth INT=0, @DifDay INT=0
 
 	SET @DifYear = @YearTo - @YearFrom
 
@@ -28,7 +28,7 @@ BEGIN
 	IF(@DifYear > 0 AND @MonthTo = @MonthFrom AND @DayTo < @DayFrom) 
 	BEGIN
 		SET @DifYear -= 1
-		SET @DifMonth = 11
+		SET @DifMonth = 12
 	END 
 
 	IF(@YearFrom = @YearTo AND @MonthTo > @MonthFrom) 
@@ -37,7 +37,7 @@ BEGIN
 	IF(@MonthTo < @MonthFrom) 
 		SET @DifMonth = 12 - @MonthFrom + @MonthTo  
 
-	ELSE IF(@MonthTo = @MonthFrom)
+	ELSE IF(@YearFrom = @YearTo AND @MonthTo = @MonthFrom)
 		SET @DifMonth = 0 
 	
 	ELSE IF(@MonthTo > @MonthFrom)
@@ -65,4 +65,4 @@ BEGIN
 	DECLARE @DifMonthChar VARCHAR(2) = CAST(@DifMonth AS VARCHAR(4))
 	DECLARE @DifDayChar VARCHAR(2) = CAST(@DifDay AS VARCHAR(4))
 	RETURN	REPLICATE('0',4-LEN(@DifYearChar))+@DifYearChar+'/'+REPLICATE('0',2-LEN(@DifMonthChar))+@DifMonthChar+'/'+REPLICATE('0',2-LEN(@DifDayChar))+@DifDayChar
-END 
+END
