@@ -6,8 +6,7 @@ AS
 set nocount on
 BEGIN
 IF NOT EXISTS(SELECT * FROM sys.objects WHERE TYPE = 'U' AND NAME = 'DimDate' AND SCHEMA_NAME(schema_id) = 'dbo')
-BEGIN
-	DROP TABLE IF EXISTS [Dbo].[DimDate]
+BEGIN	
 	CREATE TABLE [Dbo].[DimDate](
 		[ID] int NOT NULL, -- تاریخ میلادی عددی
 		[Endt] date NULL, -- تاریخ میلادی
@@ -31,11 +30,11 @@ BEGIN
 		[FrNoDayOfWeek] smallint NULL, -- ترتیب روز هفته شمسی		
 		[Qrtr] tinyint NULL, -- فصل 
 		[QrtrName] nvarchar(50) NULL, -- نام فصل 	
-		SeqID int,
+		[SeqID] int,
 	 CONSTRAINT [PK_DimDate] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 	) ON [PRIMARY]
 END
 
@@ -54,10 +53,7 @@ END
 
 
 	declare @frdate nvarchar(10),@HjDate nvarchar(10)
-	declare @ID int
-	declare @table table (ID int, Endt date , EnYear char(4),EnMonth char(2),EnDay char(2),Frdt char(10),FrYear char(4),FrMonth char(2),FrDay char(2)
-	,Hjdt nvarchar(10) , HjYear char(4),HjMonth char(2),HjDay char(2) ,EnMonthName nvarchar(50),EnDayOfWeek nvarchar(50),FrMonthName nvarchar(50),FrDayOfWeek nvarchar(50),EnNoDayOfWeek int,FrNoDayOfWeek int)
-
+	declare @ID int	
 	declare @DateDiff int = (select DATEDIFF(day,@FromDate,@UntilDate))
 	
 	;with stp1 as 
@@ -69,26 +65,49 @@ END
 	from stp1 where rn <=@DateDiff
 
 	
-	insert into @table
-	(ID,Endt,EnYear,EnMonth,EnDay,Frdt,FrYear,FrMonth,FrDay,Hjdt,HjYear,HjMonth,HjDay,EnMonthName,EnDayOfWeek,FrMonthName,FrDayOfWeek,EnNoDayOfWeek,FrNoDayOfWeek)
+	INSERT INTO [Dbo].[DimDate]
+	(
+		ID
+		,Endt
+		,EnYear
+		,EnMonth
+		,EnDay
+		,Frdt
+		,FrYear
+		,FrMonth
+		,FrYearMonth
+		,FrDay
+		,Hjdt
+		,HjYear
+		,HjMonth
+		,HjDay
+		,EnMonthName
+		,EnDayOfWeek
+		,FrMonthName
+		,FrDayOfWeek
+		,EnNoDayOfWeek
+		,FrNoDayOfWeek
+		,SeqID
+	)
 	select 
 		Cast(Format(EnDt,'yyyyMMdd') as int) as ID
 		,FORMAT(EnDt,'yyyy/MM/dd') as Endt
 		,DATEPART(year,EnDt) as EnYear
 		,FORMAT(EnDt,'MM') as EnMonth
 		,FORMAT(EnDt,'dd') as EnDay
-		,FORMAT(EnDt,'yyyy/MM/dd','fa-IR') as FrDt
-		,FORMAT(EnDt,'yyyy','fa-IR') as FrYear
-		,FORMAT(EnDt,'MM','fa-IR') as FrMonth
-		,FORMAT(EnDt,'dd','fa-IR') as FrDay
+		,FORMAT(EnDt,'yyyy/MM/dd','fa-ir') as FrDt
+		,FORMAT(EnDt,'yyyy','fa-ir') as FrYear
+		,FORMAT(EnDt,'MM','fa-ir') as FrMonth
+		,FORMAT(EnDt,'yyyyMM','fa-ir') as FrYearMonth
+		,FORMAT(EnDt,'dd','fa-ir') as FrDay
 		,FORMAT(EnDt,'yyyy/MM/dd','ar') as HjDt
 		,FORMAT(EnDt,'yyyy','ar') as HjYear
 		,FORMAT(EnDt,'MM','ar') as HjMonth
 		,FORMAT(EnDt,'dd','ar') as HjDay
 		,FORMAT(EnDt,'MMMM') as EnMonthName
 		,DATENAME(WEEKDAY,EnDt) EnDayOfWeek
-		,FORMAT(EnDt,'MMMM','fa-IR') as FrMonthName
-		,FORMAT(EnDt,'dddd','fa-IR') FrDayOfWeek
+		,FORMAT(EnDt,'MMMM','fa-ir') as FrMonthName
+		,FORMAT(EnDt,'dddd','fa-ir') FrDayOfWeek
 		,DATEPART(WEEKDAY,EnDt) as EnNoDayOfWeek
 		,case DatePart(WEEKDAY,@date)
 											when 1 then 2
@@ -99,35 +118,16 @@ END
 											when 6 then 7
 											when 7 then 1
 		end FrNoDayOfWeek	
+		,convert(int,cast(Endt as datetime)) as SeqID 
 	from #DimDate
-
 		
-	insert into Dbo.DimDate(ID,Endt,EnYear,EnMonth,EnDay,Frdt,FrYear,FrMonth,FrDay,Hjdt,HjYear,HjMonth,HjDay,EnMonthName,EnDayOfWeek
-	,FrMonthName,FrDayOfWeek,EnNoDayOfWeek,FrNoDayOfWeek,SeqID)
-	select ID,Endt,EnYear,EnMonth,EnDay,Frdt,FrYear,FrMonth,FrDay,Hjdt,HjYear,HjMonth,HjDay,EnMonthName,EnDayOfWeek
-	,FrMonthName,FrDayOfWeek,EnNoDayOfWeek,FrNoDayOfWeek,convert(int,cast(Endt as datetime)) as SeqID  
-	from @table
-
-
-
-/* فصلهای سال 
-
-ALTER TABLE Dbo.DimDate 
-ADD Qrtr TINYINT
-
-ALTER TABLE Dbo.DimDate 
-ADD QrtrName NVARCHAR(50)
-*/
-
-Update dd set Qrtr = 1 , QrtrName = N'بهار'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 1 AND 3 AND QrtrName IS NULL 
-Update dd set Qrtr = 2 , QrtrName = N'تابستان'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 4 AND 6 AND QrtrName IS NULL 
-Update dd set Qrtr = 3 , QrtrName = N'پاییز'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 7 AND 9 AND QrtrName IS NULL 
-Update dd set Qrtr = 4 , QrtrName = N'زمستان'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 10 AND 13 AND QrtrName IS NULL 
+-- فصلهای سال 
+	Update dd set Qrtr = 1 , QrtrName = N'بهار'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 1 AND 3 AND QrtrName IS NULL 
+	Update dd set Qrtr = 2 , QrtrName = N'تابستان'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 4 AND 6 AND QrtrName IS NULL 
+	Update dd set Qrtr = 3 , QrtrName = N'پاییز'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 7 AND 9 AND QrtrName IS NULL 
+	Update dd set Qrtr = 4 , QrtrName = N'زمستان'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 10 AND 13 AND QrtrName IS NULL 
 
 
 
 END
-
---select * from [Dbo].[DimDate]
-
 
