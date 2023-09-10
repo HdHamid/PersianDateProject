@@ -13,7 +13,7 @@
     </RootPath>
     <RootNamespace>PersianDateProject</RootNamespace>
     <AssemblyName>PersianDateProject</AssemblyName>
-    <ModelCollation>1033, CI</ModelCollation>
+    <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -22,6 +22,8 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>Persian_100_CI_AI_SC_UTF8</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -56,5 +58,12 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\DimDate.sql" />
+    <Build Include="dbo\Stored Procedures\FillDimDate.sql" />
   </ItemGroup>
 </Project>

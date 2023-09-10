@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[DimDate] (
+    [ID]            INT           NOT NULL,
+    [Endt]          DATE          NULL,
+    [EnYear]        CHAR (4)      NULL,
+    [EnMonth]       CHAR (2)      NULL,
+    [EnDay]         CHAR (2)      NULL,
+    [Frdt]          CHAR (10)     NULL,
+    [FrYear]        CHAR (4)      NULL,
+    [FrMonth]       CHAR (2)      NULL,
+    [FrYearMonth]   CHAR (6)      NULL,
+    [FrDay]         CHAR (2)      NULL,
+    [Hjdt]          CHAR (10)     NULL,
+    [HjYear]        CHAR (4)      NULL,
+    [HjMonth]       CHAR (2)      NULL,
+    [HjDay]         CHAR (2)      NULL,
+    [EnMonthName]   NVARCHAR (50) NULL,
+    [EnDayOfWeek]   NVARCHAR (50) NULL,
+    [FrMonthName]   NVARCHAR (50) NULL,
+    [FrDayOfWeek]   NVARCHAR (50) NULL,
+    [EnNoDayOfWeek] SMALLINT      NULL,
+    [FrNoDayOfWeek] SMALLINT      NULL,
+    [Qrtr]          TINYINT       NULL,
+    [QrtrName]      NVARCHAR (50) NULL,
+    [SeqID]         INT           NULL,
+    CONSTRAINT [PK_DimDate] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+
