@@ -22,6 +22,8 @@
     [Qrtr]          TINYINT       NULL,
     [QrtrName]      NVARCHAR (50) NULL,
     [SeqID]         INT           NULL,
+    [SeqPersianYearMonth] SMALLINT NULL, 
+    [MaxFrDayInMonth] TINYINT NULL, 
     CONSTRAINT [PK_DimDate] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

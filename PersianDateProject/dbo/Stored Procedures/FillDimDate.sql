@@ -31,6 +31,8 @@ BEGIN
 		[Qrtr] tinyint NULL, -- فصل 
 		[QrtrName] nvarchar(50) NULL, -- نام فصل 	
 		[SeqID] int,
+		[SeqPersianYearMonth] smallint,
+		[MaxFrDayInMonth] tinyint,
 	 CONSTRAINT [PK_DimDate] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -127,7 +129,29 @@ END
 	Update dd set Qrtr = 3 , QrtrName = N'پاییز'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 7 AND 9 AND QrtrName IS NULL 
 	Update dd set Qrtr = 4 , QrtrName = N'زمستان'  FROM Dbo.DimDate dd WHERE FrMonth BETWEEN 10 AND 13 AND QrtrName IS NULL 
 
+-- Fill SeqPersianYearMonth
+;WITH STP1 AS 
+(
+	SELECT DISTINCT D.FrYearMonth FROM DimDate D
+)
+,STP2 AS 
+(
+	SELECT *,ROW_NUMBER() OVER(ORDER BY FrYearMonth) AS SeqPersianYearMonth FROM STP1
+)
+UPDATE D 
+SET D.[SeqPersianYearMonth] = S2.SeqPersianYearMonth
+FROM DimDate D INNER JOIN STP2 S2 ON S2.FrYearMonth = D.FrYearMonth
 
+
+-- Fill MaxFrDayInMonth
+;WITH STP1 AS 
+(
+	SELECT FrYearMonth,MAX(FrDay) AS MxDay FROM DimDate
+	GROUP BY FrYearMonth
+)
+UPDATE D 
+	SET D.MaxFrDayInMonth = S.MxDay
+FROM DimDate D INNER JOIN STP1 S ON D.FrYearMonth = S.FrYearMonth 
 
 END
 
